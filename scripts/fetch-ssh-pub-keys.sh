@@ -23,13 +23,16 @@ FORMATTED_KEYS=${FORMATTED_KEYS%\\n}
 
 # Use yq to update the YAML file
 yq eval '.passwd.users[0].ssh_authorized_keys = []' matchbox/examples/ignition/flatcar-install.yaml > temp.yaml
+yq eval '.passwd.users[0].ssh_authorized_keys = []' matchbox/examples/ignition/flatcar.yaml > fc-temp.yaml
 
 # Now add each key
 echo "$GITHUB_KEYS" | while IFS= read -r key; do
   yq eval --inplace '.passwd.users[0].ssh_authorized_keys += ["'"$key"'"]' temp.yaml
+  yq eval --inplace '.passwd.users[0].ssh_authorized_keys += ["'"$key"'"]' fc-temp.yaml
 done
 
 # Replace the original file
 mv temp.yaml matchbox/examples/ignition/flatcar-install.yaml
+mv fc-temp.yaml matchbox/examples/ignition/flatcar.yaml
 
 echo "SSH keys updated successfully!"

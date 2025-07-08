@@ -19,7 +19,7 @@ build-matchbox-env:
 	cd matchbox && sudo ./scripts/devnet create flatcar-install 
 
 
-compile-butane:
+compile-butane-install:
 	cd matchbox && \
 	docker run --rm -i \
 		--security-opt label=disable \
@@ -29,7 +29,18 @@ compile-butane:
 		--pretty --strict \
 		examples/ignition/flatcar-install.yaml > examples/ignition/flatcar-install.ign
 
+compile-butane-flatcar:
+	cd matchbox && \
+	docker run --rm -i \
+		--security-opt label=disable \
+		--volume "${PWD}/matchbox:/pwd" \
+		--workdir /pwd \
+		quay.io/coreos/butane:release \
+		--pretty --strict \
+		examples/ignition/flatcar.yaml > examples/ignition/flatcar.ign
 
+compile-butane: compile-butane-flatcar compile-butane-install
+	
 verify-butane:
 	jq -r '.storage.files[0].contents.source' matchbox/examples/ignition/flatcar-install.ign | \
 	  sed 's/^data:;base64,//' | \
