@@ -17,8 +17,12 @@ make fetch-pubkey
 make build-matchbox-env
 ```
 
-Now, we create a 2 nodes which will install flatcar to the disk.
+Compile a butane configuration to ignition file:
 
 ```
-4081.2.1
+cat matchbox/examples/ignition/flatcar-install.yaml
+make compile-butane
+make verify-butane
 ```
+
+Now, we create a 2 nodes which will install flatcar to the disk.

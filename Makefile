@@ -17,3 +17,21 @@ build-matchbox-env:
 	./scripts/fetch-ssh-pub-keys.sh $(GITHUBUSER)
 	cd matchbox && ./scripts/get-flatcar stable $(FC_VERSION) ./examples/assets
 	cd matchbox && sudo ./scripts/devnet create flatcar-install 
+
+
+compile-butane:
+	cd matchbox && \
+	docker run --rm -i \
+		--security-opt label=disable \
+		--volume "${PWD}/matchbox:/pwd" \
+		--workdir /pwd \
+		quay.io/coreos/butane:release \
+		--pretty --strict \
+		examples/ignition/flatcar-install.yaml > examples/ignition/flatcar-install.ign
+
+
+verify-butane:
+	jq -r '.storage.files[0].contents.source' matchbox/examples/ignition/flatcar-install.ign | \
+	  sed 's/^data:;base64,//' | \
+	  base64 -d | \
+	  gunzip
