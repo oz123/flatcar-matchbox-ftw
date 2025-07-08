@@ -35,3 +35,10 @@ verify-butane:
 	  sed 's/^data:;base64,//' | \
 	  base64 -d | \
 	  gunzip
+
+launch-vms:
+	bash matchbox/scripts/libvirt create
+
+
+destroy-vms:
+	bash matchbox/scripts/libvirt destroy
