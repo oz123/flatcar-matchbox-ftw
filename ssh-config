@@ -1,0 +1,8 @@
+
+Host node1
+	Hostname 172.17.0.21
+	User core
+
+Host node2
+	Hostname 172.17.0.22
+	User core
