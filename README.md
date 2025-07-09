@@ -8,6 +8,7 @@ First, make sure you have the following installed on your system:
  * docker
  * libvirt
  * buildah
+ * jq
  * yq
 
 We start by building a matchbox enabled environment.
