@@ -21,18 +21,44 @@ done <<< "$GITHUB_KEYS"
 # Remove the trailing newline
 FORMATTED_KEYS=${FORMATTED_KEYS%\\n}
 
-# Use yq to update the YAML file
-yq eval '.passwd.users[0].ssh_authorized_keys = []' matchbox/examples/ignition/flatcar-install.yaml > temp.yaml
-yq eval '.passwd.users[0].ssh_authorized_keys = []' matchbox/examples/ignition/flatcar.yaml > fc-temp.yaml
+FILES=(
+    "matchbox/examples/ignition/flatcar-install-k8s.yaml"
+    "matchbox/examples/ignition/flatcar-enable-k8s.yaml"
+    "matchbox/examples/ignition/flatcar-install.yaml"
+    "matchbox/examples/ignition/flatcar.yaml"
+)
 
-# Now add each key
-echo "$GITHUB_KEYS" | while IFS= read -r key; do
-  yq eval --inplace '.passwd.users[0].ssh_authorized_keys += ["'"$key"'"]' temp.yaml
-  yq eval --inplace '.passwd.users[0].ssh_authorized_keys += ["'"$key"'"]' fc-temp.yaml
+update_ssh_keys() {
+    local file="$1"
+    local temp_file="${file}.temp"
+    
+    # Check if file exists
+    if [ ! -f "$file" ]; then
+        echo "Error: File $file does not exist"
+        return 1
+    fi
+    
+    echo "Updating SSH keys in $file..."
+    
+    # Clear existing SSH keys
+    yq eval '.passwd.users[0].ssh_authorized_keys = []' "$file" > "$temp_file"
+    
+    # Add each key from GITHUB_KEYS
+    echo "$GITHUB_KEYS" | while IFS= read -r key; do
+        if [ -n "$key" ]; then  # Only add non-empty keys
+            yq eval --inplace '.passwd.users[0].ssh_authorized_keys += ["'"$key"'"]' "$temp_file"
+        fi
+    done
+    
+    # Replace the original file
+    mv "$temp_file" "$file"
+    echo "Updated $file successfully"
+}
+
+# Update SSH keys in each file
+for file in "${FILES[@]}"; do
+    update_ssh_keys "$file"
 done
 
-# Replace the original file
-mv temp.yaml matchbox/examples/ignition/flatcar-install.yaml
-mv fc-temp.yaml matchbox/examples/ignition/flatcar.yaml
 
 echo "SSH keys updated successfully!"

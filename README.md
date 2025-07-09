@@ -58,3 +58,29 @@ time="2025-07-08T17:31:05Z" level=info msg="HTTP GET /ignition?uuid=631c0708-823
 time="2025-07-08T17:31:05Z" level=debug msg="Matched an Ignition or Container Linux Config template" group=stage-0 labels="map[mac:52:54:00:b2:2f:86 uuid:631c0708-8237-447f-9be8-0322be9a06ee]" profile=flatcar-install
 time="2025-07-08T17:31:12Z" level=info msg="HTTP GET /ignition?os=installed"
 ```
+
+Note about groups and profiles:
+
+profile name is the file name!
+
+Watch ignition logs:
+```
+$ ssh -F ssh-config core@master
+$ sudo journalctl -t ignition
+```
+
+
+Installing k8s:
+---------------
+
+Understanding Ignition's "Runs Once" Nature
+
+Ignition only runs once during the first boot of the system. This means:
+
+For stage 0 (PXE boot installation), Ignition runs in the temporary environment. Thisn installs FlatCar to the disk.
+For stage 1 (installed system), Ignition runs during the first boot of the installed system. This enables and configures a k8s cluster.
+After that, Ignition doesn't run again unless explicitly triggered
+
+This is why you need to include the Kubernetes extension configuration in your stage 1 Ignition file.
+
+

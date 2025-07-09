@@ -1,6 +1,11 @@
 FC_VERSION ?= 4081.2.1 
 
-
+BUTANE_CMD = docker run --rm -i \
+	--security-opt label=disable \
+	--volume "${PWD}/matchbox:/pwd" \
+	--workdir /pwd \
+	quay.io/coreos/butane:release \
+	--pretty --strict
 
 build-dnsmasq:
 	if [ ! -d dnsmasq ]; then git clone git@github.com:poseidon/dnsmasq.git; fi
@@ -21,25 +26,25 @@ build-matchbox-env:
 
 compile-butane-install:
 	cd matchbox && \
-	docker run --rm -i \
-		--security-opt label=disable \
-		--volume "${PWD}/matchbox:/pwd" \
-		--workdir /pwd \
-		quay.io/coreos/butane:release \
-		--pretty --strict \
+	$(BUTANE_CMD) \
 		examples/ignition/flatcar-install.yaml > examples/ignition/flatcar-install.ign
 
 compile-butane-flatcar:
 	cd matchbox && \
-	docker run --rm -i \
-		--security-opt label=disable \
-		--volume "${PWD}/matchbox:/pwd" \
-		--workdir /pwd \
-		quay.io/coreos/butane:release \
-		--pretty --strict \
+	$(BUTANE_CMD) \
 		examples/ignition/flatcar.yaml > examples/ignition/flatcar.ign
 
-compile-butane: compile-butane-flatcar compile-butane-install
+compile-butane-flatcar-install-k8s:
+	cd matchbox && \
+	$(BUTANE_CMD) \
+		examples/ignition/flatcar-install-k8s.yaml > examples/ignition/flatcar-install-k8s.ign
+
+compile-butane-flatcar-enable-k8s:
+	cd matchbox && \
+	$(BUTANE_CMD) \
+		examples/ignition/flatcar-enable-k8s.yaml > examples/ignition/flatcar-enable-k8s.ign
+
+compile-butane: compile-butane-flatcar compile-butane-install compile-butane-flatcar-install-k8s compile-butane-flatcar-enable-k8s
 	
 verify-butane:
 	jq -r '.storage.files[0].contents.source' matchbox/examples/ignition/flatcar-install.ign | \

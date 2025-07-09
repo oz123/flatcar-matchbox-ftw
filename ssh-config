@@ -1,8 +1,20 @@
 
 Host node1
 	Hostname 172.17.0.21
+        StrictHostKeyChecking no
 	User core
 
 Host node2
 	Hostname 172.17.0.22
+        StrictHostKeyChecking no
+	User core
+
+Host master
+	Hostname 172.17.0.23
+        StrictHostKeyChecking no
+	User core
+
+Host node 
+	Hostname 172.17.0.24
+        StrictHostKeyChecking no
 	User core
