@@ -3,6 +3,13 @@ Flatcar and Matchbox FTW!
 
 This repo is a demo of how to create a Kubernetes cluster using FlatCar Linux and Matchbox.
 
+First, make sure you have the following installed on your system:
+
+ * docker
+ * libvirt
+ * buildah
+ * yq
+
 We start by building a matchbox enabled environment.
 
 ```
