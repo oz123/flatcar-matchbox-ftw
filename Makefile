@@ -39,12 +39,17 @@ compile-butane-flatcar-install-k8s:
 	$(BUTANE_CMD) \
 		examples/ignition/flatcar-install-k8s.yaml > examples/ignition/flatcar-install-k8s.ign
 
-compile-butane-flatcar-enable-k8s:
+compile-butane-flatcar-enable-k8s-node:
 	cd matchbox && \
 	$(BUTANE_CMD) \
-		examples/ignition/flatcar-enable-k8s.yaml > examples/ignition/flatcar-enable-k8s.ign
+		examples/ignition/flatcar-enable-k8s-node.yaml > examples/ignition/flatcar-enable-k8s-node.ign
 
-compile-butane: compile-butane-flatcar compile-butane-install compile-butane-flatcar-install-k8s compile-butane-flatcar-enable-k8s
+compile-butane-flatcar-enable-k8s-master:
+	cd matchbox && \
+	$(BUTANE_CMD) \
+		examples/ignition/flatcar-k8s-master.yaml > examples/ignition/flatcar-k8s-master.ign
+
+compile-butane: compile-butane-flatcar compile-butane-install compile-butane-flatcar-install-k8s compile-butane-flatcar-enable-k8s-master compile-butane-flatcar-enable-k8s-node 
 	
 verify-butane:
 	jq -r '.storage.files[0].contents.source' matchbox/examples/ignition/flatcar-install.ign | \
