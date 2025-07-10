@@ -7,19 +7,21 @@ BUTANE_CMD = docker run --rm -i \
 	quay.io/coreos/butane:release \
 	--pretty --strict
 
-build-dnsmasq:
-	if [ ! -d dnsmasq ]; then git clone git@github.com:poseidon/dnsmasq.git; fi
-	make -C dnsmasq image-amd64
-
-build-matchbox-env:
+update-ssh-keys:
 	@if [ -z "$(GITHUBUSER)" ]; then \
 		echo "Error: GITHUBUSER variable is not set"; \
 		echo "Usage: GITHUBUSER=yourusername make build-matchbox-env"; \
 		exit 1; \
 	fi
+	./scripts/fetch-ssh-pub-keys.sh $(GITHUBUSER)
+
+build-dnsmasq:
+	if [ ! -d dnsmasq ]; then git clone git@github.com:poseidon/dnsmasq.git; fi
+	make -C dnsmasq image-amd64
+
+build-matchbox-env:
 	@echo "Creating matchbox environment with SSH keys of GitHub user: $(GITHUBUSER)"
 	if [ ! -d matchbox ]; then git clone git@github.com:oz123/matchbox.git; fi
-	./scripts/fetch-ssh-pub-keys.sh $(GITHUBUSER)
 	cd matchbox && ./scripts/get-flatcar stable $(FC_VERSION) ./examples/assets
 	cd matchbox && sudo ./scripts/devnet create flatcar-install 
 
@@ -39,17 +41,17 @@ compile-butane-flatcar-install-k8s:
 	$(BUTANE_CMD) \
 		examples/ignition/flatcar-install-k8s.yaml > examples/ignition/flatcar-install-k8s.ign
 
-compile-butane-flatcar-enable-k8s-node:
+compile-butane-flatcar-k8s-node:
 	cd matchbox && \
 	$(BUTANE_CMD) \
-		examples/ignition/flatcar-enable-k8s-node.yaml > examples/ignition/flatcar-enable-k8s-node.ign
+		examples/ignition/flatcar-k8s-node.yaml > examples/ignition/flatcar-k8s-node.ign
 
-compile-butane-flatcar-enable-k8s-master:
+compile-butane-flatcar-k8s-master:
 	cd matchbox && \
 	$(BUTANE_CMD) \
 		examples/ignition/flatcar-k8s-master.yaml > examples/ignition/flatcar-k8s-master.ign
 
-compile-butane: compile-butane-flatcar compile-butane-install compile-butane-flatcar-install-k8s compile-butane-flatcar-enable-k8s-master compile-butane-flatcar-enable-k8s-node 
+compile-butane: update-ssh-keys compile-butane-flatcar compile-butane-install compile-butane-flatcar-install-k8s compile-butane-flatcar-k8s-master compile-butane-flatcar-k8s-node 
 	
 verify-butane:
 	jq -r '.storage.files[0].contents.source' matchbox/examples/ignition/flatcar-install.ign | \
