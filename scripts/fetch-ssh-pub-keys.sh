@@ -23,8 +23,8 @@ FORMATTED_KEYS=${FORMATTED_KEYS%\\n}
 
 FILES=(
     "matchbox/examples/ignition/flatcar-install-k8s.yaml"
-    "matchbox/examples/ignition/flatcar-enable-k8s-master.yaml"
-    "matchbox/examples/ignition/flatcar-enable-k8s-node.yaml"
+    "matchbox/examples/ignition/flatcar-k8s-master.yaml"
+    "matchbox/examples/ignition/flatcar-k8s-node.yaml"
     "matchbox/examples/ignition/flatcar-install.yaml"
     "matchbox/examples/ignition/flatcar.yaml"
 )
