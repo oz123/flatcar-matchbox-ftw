@@ -65,3 +65,10 @@ launch-vms:
 
 destroy-vms:
 	bash matchbox/scripts/libvirt destroy
+
+
+launch-k8s:
+	bash matchbox/scripts/libvirt-k8s create
+
+destroy-k8s:
+	bash matchbox/scripts/libvirt-k8s destroy

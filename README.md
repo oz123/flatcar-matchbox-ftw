@@ -83,4 +83,8 @@ After that, Ignition doesn't run again unless explicitly triggered
 
 This is why you need to include the Kubernetes extension configuration in your stage 1 Ignition file.
 
+To launch the k8s cluster:
 
+```
+$ sudo make lauch-k8s
+```
